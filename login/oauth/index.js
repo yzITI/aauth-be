@@ -1,3 +1,4 @@
 module.exports = {
-  GITHUB: require('./github')
+  GITHUB: require('./github'),
+  DINGTALK: require('./dingtalk')
 }
