@@ -45,7 +45,7 @@ async function login (req) {
     if (!await store.put('user', id, { info: JSON.stringify(res.info) }) || !await store.put('link', res.linkid, { user: id })) return { status: 500, data: 'System Critical Error' }
   }
   // create token
-  const token = random() + random()
+  const token = random() + random() + random()
   if (await store.put('tmp', id, { token })) return { data: { id, info, token, newUser } }
   else return { status: 500, data: 'System Critical Error' }
 }
@@ -57,7 +57,7 @@ async function getCode (req) {
   // verify token
   if (!res || res.token.value !== req.body.token) return { status: 403, data: 'Auth failed' }
   // invalidate token 
-  const code = random() + random()
+  const code = random() + random() + random()
   if (!await store.delete('tmp', id) || !await store.put('tmp', code + 'CODE', { user: id, app: req.body.app })) return { status: 500, data: 'System Critical Error' }
   return { data: code }
 }
