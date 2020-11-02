@@ -30,7 +30,7 @@ async function login (req) {
   const res = await oauth[pf](req.body.code)
   if (!res) return { status: 403, data: 'Login Fails' }
   // user link
-  let id = random()
+  let id = random() + random()
   let newUser = true
   let info = res.info
   try {
