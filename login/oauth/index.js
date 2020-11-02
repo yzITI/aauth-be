@@ -1,4 +1,6 @@
 module.exports = {
   GITHUB: require('./github'),
-  DINGTALK: require('./dingtalk')
+  DINGTALK: require('./dingtalk'),
+  XYZSAS: require('./xyzsas'),
+  QQ: require('./qq')
 }
