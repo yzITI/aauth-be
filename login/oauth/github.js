@@ -22,7 +22,7 @@ module.exports = async function (code) {
     return {
       linkid: info.id + 'GITHUB',
       info: {
-        name: info.name,
+        name: info.name || info.login,
         username: info.login,
         email: info.email,
         avatar: info.avatar_url,
