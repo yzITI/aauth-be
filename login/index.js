@@ -1,10 +1,12 @@
 const serverless = require('./serverless')
 const oauth = require('./oauth')
+const crypto = require('crypto')
 const store = serverless.store
 
 exports.initializer = serverless.initializer
 
 const random = () => Math.random().toString(36).substr(2)
+const cryptoRandom = (len) => crypto.randomBytes(len).toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 
 async function getApp (req) {
   if (!req.queries.app) return { status: 400, data: 'Params error, require app' }
@@ -45,7 +47,7 @@ async function login (req) {
     if (!await store.put('user', id, { info: JSON.stringify(res.info) }) || !await store.put('link', res.linkid, { user: id })) return { status: 500, data: 'System Critical Error' }
   }
   // create token
-  const token = random() + random() + random()
+  const token = cryptoRandom(32)
   if (await store.put('tmp', id, { token })) return { data: { id, info, token, newUser } }
   else return { status: 500, data: 'System Critical Error' }
 }
@@ -57,7 +59,7 @@ async function getCode (req) {
   // verify token
   if (!res || res.token.value !== req.body.token) return { status: 403, data: 'Auth failed' }
   // invalidate token 
-  const code = random() + random() + random()
+  const code = cryptoRandom(32)
   if (!await store.delete('tmp', id) || !await store.put('tmp', code + 'CODE', { user: id, app: req.body.app })) return { status: 500, data: 'System Critical Error' }
   return { data: code }
 }
