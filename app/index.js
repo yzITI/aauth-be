@@ -30,7 +30,7 @@ async function getApp (req) {
 }
 
 async function editApp (req) {
-  if (!req.body.name) return { status: 400, data: 'Params Error, name is required.' }
+  if (!req.body.name || !req.body.redirect) return { status: 400, data: 'Params Error, require name, redirect' }
   let id = req.body.id
   if (!id) id = req.user + random()
   if (id.indexOf(req.user) !== 0) return { status: 403, data: 'Forbidden' }
