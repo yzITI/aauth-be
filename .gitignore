@@ -1,5 +1,5 @@
 # config
-login/oauth/config.js
+auth/oauth/config.js
 node_modules/*
 .DS_Store
 test.js

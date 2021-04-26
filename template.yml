@@ -1,0 +1,47 @@
+ROSTemplateFormatVersion: '2015-09-01'
+Transform: 'Aliyun::Serverless-2018-04-03'
+Resources:
+  aauth:
+    Type: 'Aliyun::Serverless::Service'
+    Properties:
+      InternetAccess: true
+    app:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: nodejs12
+        Timeout: 20
+        MemorySize: 128
+        InstanceConcurrency: 100
+        EnvironmentVariables: {}
+        CodeUri: ./app
+      Events:
+        defaultTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: anonymous
+            Methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+    auth:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: nodejs12
+        Timeout: 20
+        MemorySize: 128
+        InstanceConcurrency: 100
+        EnvironmentVariables: {}
+        CodeUri: ./auth
+      Events:
+        defaultTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: anonymous
+            Methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE

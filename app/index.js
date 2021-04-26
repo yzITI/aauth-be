@@ -1,65 +1,64 @@
-const serverless = require('./serverless')
-const crypto = require('crypto')
-const store = serverless.store
+const { A, C, E, S } = require('/opt')
 
-exports.initializer = serverless.initializer
+module.exports = E
 
-const random = () => Math.random().toString(36).substr(2)
-const cryptoRandom = (len) => crypto.randomBytes(len).toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
-
-async function auth (req) {
-  if (!req.headers.user || !req.headers.token) return { status: 403, data: 'Auth failed' }
-  const id = req.headers.user
-  const res = await store.get('tmp', id)
-  // verify token
-  if (!res || res.token.value !== req.headers.token) return { status: 403, data: 'Auth failed' }
-  // next
-  req.user = id
-  return false
-}
-
-async function getApp (req) {
-  const res = await store.getRange('app', req.user, req.user + '~')
-  for (const id in res) {
-    let data = {}
-    for (const k in res[id]) data[k] = res[id][k].value
-    data.secret = '******'
-    res[id] = data
+async function auth(req) {
+  const v = C.verify(req.headers.token)
+  if (!v) return ['认证失败', 400]
+  const user = await S('user').get(v[1], ['app'])
+  if (!user) {
+    return ['没有权限', 403]
   }
-  return { data: res }
+  user.app = user.app.split(',')
+  req.user = user
 }
 
-async function editApp (req) {
-  if (!req.body.name || !req.body.redirect) return { status: 400, data: 'Params Error, require name, redirect' }
-  let id = req.body.id
-  if (!id) id = req.user + random()
-  if (id.indexOf(req.user) !== 0) return { status: 403, data: 'Forbidden' }
-  req.body.secret = cryptoRandom(40)
-  delete req.body.id
-  if (await store.put('app', id, req.body)) return { data: 'Success' }
-  else return { status: 500, data: 'System Critical Error' }
-}
+A.get('/app/:id', auth, (req) => {
+  let res = []
+  for (const i of req.user.app) {
+    const app = await S('app').get(i)
+    if (!app) return ['系统核心错误', 500]
+    delete app.secret
+    delete app._timestamp
+    res.push(app)
+  }
+  return [res, 200]
+})
 
-async function freshApp (req) {
-  const id = req.body.id
-  if (!id) return { status: 400, data: 'Params Error, id is required.' }
-  if (id.indexOf(req.user) !== 0) return { status: 403, data: 'Forbidden' }
-  const secret = cryptoRandom(40)
-  if (await store.update('app', id, { secret })) return { data: secret }
-  else return { status: 500, data: 'System Critical Error' }
-}
+A.post('/app/:id', auth, (req) => {
+  const b = req.body
+  let id = req.params.id
+  if (!b || !b.name || !b.redirect) return ['参数错误', 400]
+  if (id && req.user.app.indexOf(id) === -1)
+    return ['应用不存在', 404]
+  if (!id) {
+    id = C.random()
+    req.user.app.push(id)
+    if (!await S('user').update(req.user.id, { app: req.user.app.join(',') }))
+      return ['系统核心错误', 500]
+  }
+  delete b.id
+  delete b.secret
+  if (await S('app').update(id, b)) return ['成功']
+  else return ['系统核心错误', 500]
+})
 
-async function deleteApp (req) {
-  const id = req.queries.id
-  if (!id) return { status: 400, data: 'Params Error, id is required.' }
-  if (id.indexOf(req.user) !== 0) return { status: 403, data: 'Forbidden' }
-  if (await store.delete('app', id)) return { data: 'Success' }
-  else return { status: 500, data: 'System Critical Error' }
-}
+A.put('/app/:id', auth, (req) => {
+  let id = req.params.id
+  if (id && req.user.app.indexOf(id) === -1)
+    return ['应用不存在', 404]
+  const secret = C.random()
+  if (await S('app').update(id, { secret })) return [secret]
+  else return ['系统核心错误', 500]
+})
 
-exports.handler = serverless.handler({
-  GET: [auth, getApp],
-  POST: [auth, editApp],
-  PUT: [auth, freshApp],
-  DELETE: [auth, deleteApp]
+A.delete('/app/:id', auth, (req) => {
+  let id = req.params.id
+  if (id && req.user.app.indexOf(id) === -1)
+    return ['应用不存在', 404]
+  if (!await S('app').delete(id)) return ['系统核心错误', 500]
+  req.user.app.splice(req.user.app.indexOf(id), 1)
+  if (!await S('user').update(req.user.id, { app: req.user.app.join(',') }))
+    return ['系统核心错误', 500]
+  return ['成功']
 })
