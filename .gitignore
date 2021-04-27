@@ -3,3 +3,4 @@ auth/oauth/config.js
 node_modules/*
 .DS_Store
 test.js
+.fun

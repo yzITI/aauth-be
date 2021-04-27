@@ -4,10 +4,13 @@ Resources:
   aauth:
     Type: 'Aliyun::Serverless::Service'
     Properties:
+      Role: 'acs:ram::1636293269831137:role/fc-role'
       InternetAccess: true
     app:
       Type: 'Aliyun::Serverless::Function'
       Properties:
+        Initializer: index.initializer
+        InitializationTimeout: 3
         Handler: index.handler
         Runtime: nodejs12
         Timeout: 20
@@ -23,11 +26,12 @@ Resources:
             Methods:
               - GET
               - POST
-              - PUT
               - DELETE
     auth:
       Type: 'Aliyun::Serverless::Function'
       Properties:
+        Initializer: index.initializer
+        InitializationTimeout: 3
         Handler: index.handler
         Runtime: nodejs12
         Timeout: 20
@@ -44,4 +48,3 @@ Resources:
               - GET
               - POST
               - PUT
-              - DELETE
