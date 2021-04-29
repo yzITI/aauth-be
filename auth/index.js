@@ -14,6 +14,7 @@ A.get('/auth/:app', async (req) => {
   if (!user) return['身份验证失败', 403]
   const app = await S('app').get(req.params.app)
   if (!app || !app.redirect) return ['应用不存在或不支持登录', 404]
+  delete user.apps
   if (app.token) {
     app.token = app.token.replace('[timestamp]', Date.now())
     for (const k in user) app.token = app.token.replace(`[${k}]`, user[k])
