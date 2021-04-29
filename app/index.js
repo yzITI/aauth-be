@@ -63,8 +63,10 @@ A.post('/app/:id', auth, async (req) => {
     req.user.apps.push(id)
     await S('user').update(req.user.id, { apps: String(req.user.apps) })
   }
-  if (await S('app').put(id, app)) return [app]
-  else return ['系统核心错误', 500]
+  if (!await S('app').put(id, app)) return ['系统核心错误', 500]
+  if (!b.secret) delete app.secret
+  if (!b.key) delete app.sk
+  return [app]
 })
 
 A.delete('/app/:id', auth, async (req) => {

@@ -51,6 +51,7 @@ A.put('/auth/', async (req) => {
   if (!await S('user').put(uid, res.info)) return ['系统核心错误', 500]
   return [{
     info: res.info,
+    app: app.name,
     token: C.sign([Date.now() + 30*86400e3, uid])
   }, 200]
 })

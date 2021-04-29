@@ -15,7 +15,7 @@ module.exports = async function (code) {
       .then(data => JSON.parse(data))
       .then(data => data.openid)
     if (!openid) return false
-    const info = await request('GET', `https://graph.qq.com/user/get_user_info?access_token=${accessToken}&oauth_consumer_key=${c.id}&openid=${openid}`)
+    const info = await C.request('GET', `https://graph.qq.com/user/get_user_info?access_token=${accessToken}&oauth_consumer_key=${c.id}&openid=${openid}`)
       .then(data => JSON.parse(data))
     return {
       linkid: openid + 'QQ',
