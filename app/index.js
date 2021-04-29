@@ -16,14 +16,14 @@ async function auth(req) {
 }
 
 A.get('/app/', auth, async (req) => {
-  const nA = [], res = []
+  const nA = [], res = {}
   for (const a of req.user.apps) {
     const app = await m.get(a)
     if (!app) continue
     nA.push(a)
     delete app.secret
     delete app.sk
-    res.push(app)
+    res[a] = app
   }
   if (nA != req.user.apps) await S('user').update(req.user.id, { apps: String(nA) })
   return [res]
