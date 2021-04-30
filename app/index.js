@@ -46,7 +46,7 @@ A.post('/app/:id', auth, async (req) => {
   if (!b || !b.name) return ['参数错误', 400]
   const key = C.RSA.generate()
   const app = {
-    id, name: b.name,
+    name: b.name,
     secret: old ? old.secret : C.random(64),
     pk: old ? old.pk : key.pk,
     sk: old ? old.sk : key.sk
@@ -66,6 +66,7 @@ A.post('/app/:id', auth, async (req) => {
   if (!await S('app').put(id, app)) return ['系统核心错误', 500]
   if (!b.secret) delete app.secret
   if (!b.key) delete app.sk
+  app.id = id
   return [app]
 })
 
