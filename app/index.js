@@ -54,6 +54,7 @@ A.post('/app/:id', auth, async (req) => {
   if (b.icon) app.icon = b.icon
   if (b.token) app.token = b.token
   if (b.platforms) app.platforms = b.platforms
+  if (b.redirect) app.redirect = b.redirect
   if (b.secret) app.secret = C.random(64)
   if (b.key) {
     app.pk = key.pk

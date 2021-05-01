@@ -34,7 +34,7 @@ Resources:
         InitializationTimeout: 3
         Handler: index.handler
         Runtime: nodejs12
-        Timeout: 20
+        Timeout: 10
         MemorySize: 128
         InstanceConcurrency: 100
         EnvironmentVariables: {}
