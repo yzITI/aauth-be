@@ -1,12 +1,13 @@
 // XYZSAS Login
 
-const { C } = require('/opt')
-const config = require('./config')
-const c = config.xyzsas
+const { S, C } = require('/opt')
 
 module.exports = async function (code) {
   try {
-    const url = `https://sas.aauth.link/auth?code=${code}&secret=${c.secret}`
+    const app = await S('app').get('xyzsas')
+    if (!app) return false
+    const enCode = C.RSA.encrypt(app.sk, (Date.now() + 600e3) + ',' + code)
+    const url = `https://sas.aauth.link/auth/?code=${enCode}`
     const info = await C.request('DELETE', url)
       .then(data => JSON.parse(data))
     

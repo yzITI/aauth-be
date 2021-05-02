@@ -49,6 +49,8 @@ A.put('/auth/', async (req) => {
   for (const k in res.info) {
     if (!res.info[k]) delete res.info[k]
   }
+  if (res.info.id) res.info.uid = res.info.id
+  delete res.info.id
   if (!await S('user').update(uid, res.info)) return ['系统核心错误', 500]
   return [{
     info: res.info,
