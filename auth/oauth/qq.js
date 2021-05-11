@@ -7,7 +7,7 @@ const c = config.qq
 module.exports = async function (code) {
   try {
     const accessToken = await C.request('GET', 
-      `https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id=${c.id}&client_secret=${c.secret}&code=${code}&redirect_uri=https%3A%2F%2Faauth.link%2Freenter.html`)
+      `https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id=${c.id}&client_secret=${c.secret}&code=${code}&redirect_uri=https%3A%2F%2Fcn.aauth.link%2Freenter.html`)
       .then(res => res.split('&')[0])
       .then(res => res.indexOf('access_token') === 0 ? res.substring(13) : false)
     if (!accessToken) return false

@@ -45,16 +45,17 @@ A.put('/auth/', async (req) => {
   if (!oauth[b.platform] || (app.platforms && app.platforms.indexOf(b.platform) === -1)) return ['平台不支持', 403]
   const res = await oauth[b.platform](req.body.code)
   if (!res) return ['登录失败', 403]
-  const uid = C.md5(res.linkid)
+  const id = C.md5(res.linkid)
   for (const k in res.info) {
     if (!res.info[k]) delete res.info[k]
   }
   if (res.info.id) res.info.uid = res.info.id
   delete res.info.id
-  if (!await S('user').update(uid, res.info)) return ['系统核心错误', 500]
+  if (!await S('user').update(id, res.info)) return ['系统核心错误', 500]
+  res.info.id = id
   return [{
     info: res.info,
     app: app.name,
-    token: C.sign([Date.now() + 30*86400e3, uid])
+    token: C.sign([Date.now() + 30*86400e3, id])
   }, 200]
 })
